@@ -69,9 +69,26 @@ TIMEOUT_SECONDS=60.0
 
 ### 3. Generate Type-Safe Code
 
-Run the code generator:
+#### Option 1: Global Installation (Recommended)
+
+Install the package globally for easier use across projects:
 
 ```bash
+# Install globally
+dart pub global activate flutter_environment_config
+
+# Generate code from any Flutter project directory
+generate
+```
+
+#### Option 2: Project Dependency
+
+Add to your project dependencies and run locally:
+
+```bash
+# Add as dependency
+flutter pub add flutter_environment_config
+
 # Using dart run (recommended)
 dart run flutter_environment_config:generate
 
@@ -238,9 +255,27 @@ The generator works seamlessly across all development platforms:
 
 ## 📝 Installation
 
-Add this to your package's `pubspec.yaml` file:
+### Option 1: Global Installation (Recommended)
+
+Install globally for easy access across all projects:
+
+```bash
+# Install globally
+dart pub global activate flutter_environment_config
+
+# Verify installation
+dart pub global list
+
+# Use anywhere
+generate
+```
+
+### Option 2: Project Dependency
+
+Add as a project dependency:
 
 ```yaml
+# pubspec.yaml
 dependencies:
   flutter_environment_config: ^1.0.0
 ```
@@ -249,7 +284,12 @@ Then run:
 
 ```bash
 flutter pub get
+
+# Generate code
+dart run flutter_environment_config:generate
 ```
+
+> **💡 Tip**: Global installation is recommended for better developer experience and easier CI/CD integration.
 
 ## 🛠️ Setup
 
