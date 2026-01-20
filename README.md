@@ -223,15 +223,6 @@ NSString *apiKey = [FlutterEnvironmentConfigPlugin envFor:@"API_KEY"];
 
 Environment variables are available in your Android build process. See the [Android Setup Guide](docs/ANDROID.md) for detailed configuration.
 
-## 🎯 Cross-Platform Support
-
-The generator works seamlessly across all development platforms:
-
-- **Windows**: Uses `%LOCALAPPDATA%\Pub\Cache` or `%APPDATA%\Pub\Cache`
-- **macOS**: Uses `~/.pub-cache`
-- **Linux**: Uses `~/.pub-cache`
-- **Custom**: Respects `PUB_CACHE` environment variable
-
 ## 📝 Installation
 
 Add as a project dependency:
@@ -368,8 +359,8 @@ flutter_environment_config:
 
 ## 📚 Documentation
 
-- [Android Setup Guide](docs/ANDROID.md) - Detailed Android configuration
-- [iOS Setup Guide](docs/IOS.md) - Advanced iOS usage
+- [Android Setup Guide](docs/CONFIG_ANDROID.md) - Detailed Android configuration
+- [iOS Setup Guide](docs/CONFIG_IOS.md) - Advanced iOS usage
 
 ## 🤝 Contributing
 
