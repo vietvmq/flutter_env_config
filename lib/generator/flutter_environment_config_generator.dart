@@ -6,7 +6,7 @@ import 'package:yaml/yaml.dart';
 /// Simple script to generate type-safe environment configuration extension
 /// on FlutterEnvironmentConfig. Can be run from the library or consumer project.
 void main(List<String> args) async {
-  print(_cyan('🔧 Generating FlutterEnvironmentConfig extension...'));
+  print(_cyan('🔧 Generating FlutterEnvironmentConfig...'));
   print('');
 
   // Detect project context and configuration
