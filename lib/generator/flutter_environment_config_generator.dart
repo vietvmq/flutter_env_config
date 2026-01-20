@@ -4,13 +4,23 @@ import 'dart:io';
 import 'package:yaml/yaml.dart';
 
 /// Simple script to generate type-safe environment configuration extension
-/// on FlutterEnvironmentConfig. Can be run from the library or consumer project.
+/// on FlutterEnvironmentConfig. Only runs for consumer projects that import this library.
 void main(List<String> args) async {
   print(_cyan('🔧 Generating FlutterEnvironmentConfig...'));
   print('');
 
   // Detect project context and configuration
   final projectConfig = await detectProjectConfig();
+  
+  if (projectConfig == null) {
+    print(_yellow('⚠️  This command should be run from a project that uses flutter_environment_config.'));
+    print('');
+    print('💡 Make sure you have added flutter_environment_config to your pubspec.yaml:');
+    print('   dependencies:');
+    print('     flutter_environment_config: ^1.0.0');
+    return;
+  }
+  
   final workingDirectory = Directory(projectConfig.workingDir);
   final outputPath = projectConfig.outputPath;
 
@@ -71,14 +81,10 @@ void main(List<String> args) async {
   print(_green('✅ Generation completed:'));
   print('📊 Generated ${envVariables.length} environment variables');
   print('📁 Output: ${outputFile.path}');
-  
-  if (projectConfig.isConsumerProject) {
-    print('🎯 Generated in consumer project');
-    print('');
-    print(_brightYellow('💡 Customize output directory in pubspec.yaml:'));
-    print('   flutter_environment_config:');
-    print('     output_dir: lib  # or any other directory');
-  }
+  print('');
+  print(_brightYellow('💡 Customize output directory in pubspec.yaml:'));
+  print('   flutter_environment_config:');
+  print('     output_dir: lib/generated  # or any other directory');
   
   print('');
   print(_brightCyan('🎉 Done! You can now use FlutterEnvironmentConfigGeneration.propertyName for type-safe access.'));
@@ -150,18 +156,10 @@ String generateExtension(Map<String, EnvVariable> variables, List<String> allEnv
   buffer.writeln('// GENERATED CODE - DO NOT MODIFY BY HAND');
   buffer.writeln('// Generated on: ${DateTime.now().toIso8601String()}');
   buffer.writeln('// Variables: ${variables.length} from ${allEnvFiles.length} environment files');
-  buffer.writeln('// Project: ${config.isConsumerProject ? 'Consumer' : 'Library'}');
   buffer.writeln();
   
-  if (config.isConsumerProject) {
-    // For consumer projects, generate standalone classes
-    buffer.writeln('import \'package:flutter_environment_config/flutter_environment_config.dart\';');
-    buffer.writeln();
-  } else {
-    // For library projects, also use package import for consistency
-    buffer.writeln('import \'package:flutter_environment_config/flutter_environment_config.dart\';');
-    buffer.writeln();
-  }
+  buffer.writeln('import \'package:flutter_environment_config/flutter_environment_config.dart\';');
+  buffer.writeln();
   
   // Generate the Generation class
   buffer.writeln('/// Type-safe access to environment variables through code generation.');
@@ -245,17 +243,16 @@ String generateConstantName(String envKey) {
 class ProjectConfig {
   final String workingDir;
   final String outputPath;
-  final bool isConsumerProject;
 
   ProjectConfig({
     required this.workingDir,
     required this.outputPath,
-    required this.isConsumerProject,
   });
 }
 
 /// Detect project context and determine output configuration
-Future<ProjectConfig> detectProjectConfig() async {
+/// Returns null if not a valid consumer project
+Future<ProjectConfig?> detectProjectConfig() async {
   final currentDir = Directory.current.path;
   
   // Check if we're in a Flutter project (has pubspec.yaml)
@@ -263,6 +260,16 @@ Future<ProjectConfig> detectProjectConfig() async {
   if (await pubspecFile.exists()) {
     final pubspecContent = await pubspecFile.readAsString();
     final pubspec = loadYaml(pubspecContent) as Map;
+    
+    // Check if we're running from within the library itself - reject this case
+    final libDir = Directory('$currentDir/lib');
+    if (await libDir.exists()) {
+      final mainFile = File('$currentDir/lib/flutter_environment_config.dart');
+      if (await mainFile.exists()) {
+        // We're in the library project - don't generate here
+        return null;
+      }
+    }
     
     // Check if this project uses flutter_environment_config
     final dependencies = pubspec['dependencies'] as Map?;
@@ -277,7 +284,6 @@ Future<ProjectConfig> detectProjectConfig() async {
       return ProjectConfig(
         workingDir: currentDir,
         outputPath: '$currentDir/$outputDir/flutter_environment_config.g.dart',
-        isConsumerProject: true,
       );
     }
     
@@ -286,29 +292,10 @@ Future<ProjectConfig> detectProjectConfig() async {
     if (configFromPackages != null) {
       return configFromPackages;
     }
-    
-    // Check if we're running from within the library itself
-    final libDir = Directory('$currentDir/lib');
-    if (await libDir.exists()) {
-      final mainFile = File('$currentDir/lib/flutter_environment_config.dart');
-      if (await mainFile.exists()) {
-        // We're in the library project - also check for custom output directory
-        final outputDir = _getOutputDirFromPubspec(pubspec);
-        return ProjectConfig(
-          workingDir: currentDir,
-          outputPath: '$currentDir/$outputDir/flutter_environment_config.g.dart',
-          isConsumerProject: false,
-        );
-      }
-    }
   }
   
-  // Default to current directory
-  return ProjectConfig(
-    workingDir: currentDir,
-    outputPath: '$currentDir/lib/flutter_environment_config.g.dart',
-    isConsumerProject: false,
-  );
+  // Not a valid consumer project
+  return null;
 }
 
 /// Get output directory from pubspec.yaml configuration
@@ -323,9 +310,9 @@ String _getOutputDirFromPubspec(Map pubspec) {
     }
   }
   
-  // Default to lib directory
-  print('📁 Using default output directory: lib');
-  return 'lib';
+  // Default to lib/generated directory
+  print('📁 Using default output directory: lib/generated');
+  return 'lib/generated';
 }
 
 /// Find flutter_environment_config configuration from packages subdirectories
@@ -354,7 +341,6 @@ Future<ProjectConfig?> _findConfigInPackages(String projectRoot) async {
               return ProjectConfig(
                 workingDir: projectRoot,
                 outputPath: '$projectRoot/$outputDir/flutter_environment_config.g.dart',
-                isConsumerProject: true,
               );
             }
           } catch (e) {

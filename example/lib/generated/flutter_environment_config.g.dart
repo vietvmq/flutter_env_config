@@ -1,7 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// Generated on: 2026-01-20T20:50:31.447442
+// Generated on: 2026-01-20T21:16:54.009333
 // Variables: 6 from 3 environment files
-// Project: Consumer
 
 import 'package:flutter_environment_config/flutter_environment_config.dart';
 

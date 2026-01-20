@@ -75,7 +75,7 @@ Run the code generator:
 dart run flutter_environment_config:generate
 ```
 
-This generates `flutter_environment_config.g.dart` with type-safe getters:
+This generates `lib/generated/flutter_environment_config.g.dart` with type-safe getters:
 
 ```dart
 // Auto-generated - DO NOT MODIFY
@@ -107,7 +107,7 @@ abstract class FlutterEnvironmentConfigGeneration {
 
 ```dart
 import 'package:flutter_environment_config/flutter_environment_config.dart';
-import 'lib/flutter_environment_config.g.dart'; // Generated file
+import 'lib/generated/flutter_environment_config.g.dart'; // Generated file
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -136,7 +136,7 @@ Configure where generated files are placed:
 ```yaml
 # pubspec.yaml
 flutter_environment_config:
-  output_dir: lib/environment  # Default: lib
+  output_dir: lib/environment  # Default: lib/generated
 ```
 
 ### Multi-Package Projects
@@ -275,7 +275,7 @@ Use `loadValueForTesting` to mock environment variables in your tests:
 
 ```dart
 import 'package:flutter_environment_config/flutter_environment_config.dart';
-import 'lib/flutter_environment_config.g.dart';
+import 'lib/generated/flutter_environment_config.g.dart';
 
 void main() {
   setUp(() {
@@ -333,7 +333,7 @@ The generator provides detailed information:
 🔧 Flutter Environment Config Generator
 📋 Configuration:
 📁 Working directory: /path/to/project
-📄 Output path: /path/to/project/lib/flutter_environment_config.g.dart
+📄 Output path: /path/to/project/lib/generated/flutter_environment_config.g.dart
 
 📂 Reading environment files:
 📖 Reading .env.develop
@@ -342,7 +342,7 @@ The generator provides detailed information:
 
 ✅ Generation completed:
 📊 Generated 18 environment variables
-📁 Output: lib/flutter_environment_config.g.dart
+📁 Output: lib/generated/flutter_environment_config.g.dart
 ```
 
 ### Multi-Package Support
