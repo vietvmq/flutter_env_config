@@ -15,7 +15,7 @@ def getCurrentFlavor() {
     gradle.getStartParameter().getTaskNames().any { name ->
         Matcher matcher = pattern.matcher(name)
         if (matcher.find()) {
-            flavor = matcher.group(1).toLowerCase()
+            flavor = matcher.group(1)
             return true
         }
     }
