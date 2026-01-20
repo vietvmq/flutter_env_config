@@ -1,1 +1,0 @@
-  #define DOT_ENV @{ @"APP_NAME":@"EX - DEV",@"APP_BUNDLE_ID":@"com.vietvmq.flutter_environment_config_example.develop",@"APP_VERSION_NAME":@"1.0.0",@"APP_VERSION_BUILD":@"100",@"API_KEY":@"",@"EMPTY_VALUE":@"" };
