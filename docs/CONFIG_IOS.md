@@ -8,9 +8,10 @@ First, create environment files in your project root:
 
 ```text
 my_app/
-├── .env.develop         # Development environment
-├── .env.staging         # Staging environment
-├── .env.production      # Production environment
+├── env/
+│   ├── .env.develop     # Development environment
+│   ├── .env.staging     # Staging environment
+│   └── .env.production  # Production environment
 ├── pubspec.yaml
 └── ios/
     └── Runner/
@@ -93,7 +94,7 @@ Go to **Build > Pre-actions** and add **New Run Script Action**:
 **First Script:**
 
 ```bash
-echo "/env/.env" > ${SRCROOT}/.envfile
+echo "env/.env" > ${SRCROOT}/.envfile
 ```
 
 **Second Script:**
@@ -238,10 +239,10 @@ Add to your `.gitignore`:
 
 ```gitignore
 # Environment files
-.env.develop
-.env.staging
-.env.production
-.env.local
+env/.env.develop
+env/.env.staging
+env/.env.production
+env/.env.local
 
 # Generated files
 **/ios/Flutter/tmp.xcconfig
@@ -250,9 +251,9 @@ Add to your `.gitignore`:
 Create example files for team members:
 
 ```text
-.env.develop.example
-.env.staging.example
-.env.production.example
+env/.env.develop.example
+env/.env.staging.example
+env/.env.production.example
 ```
 
 ### 3. Build Configuration

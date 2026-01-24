@@ -8,9 +8,10 @@ First, create environment files in your project root:
 
 ```text
 my_app/
-├── .env.develop         # Development environment
-├── .env.staging         # Staging environment
-├── .env.production      # Production environment
+├── env/
+│   ├── .env.develop     # Development environment
+│   ├── .env.staging     # Staging environment
+│   └── .env.production  # Production environment
 ├── pubspec.yaml
 └── android/
     └── app/
@@ -62,9 +63,9 @@ In your `android/app/build.gradle` file:
 ```gradle
 // Environment file mapping (optional - for multiple environments)
 project.ext.envConfigFiles = [
-    develop: ".env.develop",
-    staging: ".env.staging",
-    production: ".env.production"
+    develop: "env/.env.develop",
+    staging: "env/.env.staging",
+    production: "env/.env.production"
 ]
 
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
@@ -99,7 +100,7 @@ android {
 ```gradle
 android {
     defaultConfig {
-        applicationId project.env.get("APP_ID") ?: "com.example.my_app"
+        applicationId project.env.get("APP_ID")
         versionName project.env.get("VERSION_NAME")
         versionCode project.env.get("VERSION_CODE").toInteger()
     }
@@ -245,18 +246,18 @@ Add to your `.gitignore`:
 
 ```gitignore
 # Environment files
-.env.develop
-.env.staging
-.env.production
-.env.local
+env/.env.develop
+env/.env.staging
+env/.env.production
+env/.env.local
 ```
 
 Create example files for team members:
 
 ```text
-.env.develop.example
-.env.staging.example
-.env.production.example
+env/.env.develop.example
+env/.env.staging.example
+env/.env.production.example
 ```
 
 ## ⚠️ Security
