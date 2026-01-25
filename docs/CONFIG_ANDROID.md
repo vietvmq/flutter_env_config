@@ -128,11 +128,20 @@ Enable BuildConfig generation in `android/app/build.gradle`:
 
 ```gradle
 android {
+    defaultConfig {
+        // ... other configurations
+        
+        // Add this line to specify the package name for BuildConfig access
+        resValue "string", "build_config_package", "YOUR_PACKAGE_NAME_IN_ANDROIDMANIFEST.XML"
+    }
+    
     buildFeatures {
         buildConfig = true
     }
 }
 ```
+
+**Note:** Replace `YOUR_PACKAGE_NAME_IN_ANDROIDMANIFEST.XML` with your actual package name from `AndroidManifest.xml`. This configuration allows the plugin to access BuildConfig variables from the correct package.
 
 ### 6. Configure ProGuard (Release Builds)
 

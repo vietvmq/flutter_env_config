@@ -65,6 +65,7 @@ android {
         targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        resValue "string", "build_config_package", "com.vietvmq.flutter_environment_config_example"
     }
 
     buildTypes {
