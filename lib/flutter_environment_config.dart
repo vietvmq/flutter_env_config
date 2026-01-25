@@ -60,7 +60,7 @@ class FlutterEnvironmentConfig {
   }
 
   /// Variables need to be loaded on app startup, recommend to do it `main.dart`
-  static loadEnvVariables({
+  static Future<void> loadEnvVariables({
     Map<String, dynamic>? webVariables,
   }) async {
     if (kDebugMode) {
@@ -170,7 +170,7 @@ class FlutterEnvironmentConfig {
   }
 
   @visibleForTesting
-  static loadValueForTesting(Map<String, dynamic> values) {
+  static void loadValueForTesting(Map<String, dynamic> values) {
     _instance._variables = values;
   }
 }
