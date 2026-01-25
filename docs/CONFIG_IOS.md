@@ -54,17 +54,9 @@ API_KEY=prod-key-789
 DEBUG_MODE=false
 ```
 
-## 🚀 Quick Setup
+## �️ Setup
 
-### Basic Setup (Code Access Only)
-
-No additional setup is required if you only need to read environment variables from Swift/Objective-C code.
-
-### Advanced Setup (Build Settings & Info.plist)
-
-Follow these steps if you need environment variables in `Info.plist` or build settings:
-
-#### 3. Configure XCConfig Files
+### 1. Configure XCConfig Files
 
 Under `Runner/Flutter`, add to both `Debug.xcconfig` and `Release.xcconfig`:
 
@@ -81,7 +73,7 @@ Add to `.gitignore`:
 **/ios/Flutter/tmp.xcconfig
 ```
 
-#### 4. Setup Build Pre-Actions
+### 2. Edit Scheme
 
 In Xcode menu: **Product > Scheme > Edit Scheme**
 
@@ -91,28 +83,73 @@ Go to **Build > Pre-actions** and add **New Run Script Action**:
 
 ![Add Run Script Action](./ios_add_run_script_action.png)
 
-**First Script:**
+#### Develop Environment
 
+**First Script:**
 ```bash
-echo "env/.env" > ${SRCROOT}/.envfile
+echo "env/.env.develop" > ${SRCROOT}/.envfile
 ```
 
 **Second Script:**
-
 ```bash
 ${SRCROOT}/.symlinks/plugins/flutter_environment_config/ios/Classes/BuildXCConfig.rb ${SRCROOT}/ ${SRCROOT}/Flutter/tmp.xcconfig
 ```
 
-**Example configurations for different environments:**
-
-**Development Scheme:**
 ![Development Scheme Configuration](./ios_scheme_develop.png)
 
-**Staging Scheme:**
+#### Staging Environment
+
+**First Script:**
+```bash
+echo "env/.env.staging" > ${SRCROOT}/.envfile
+```
+
+**Second Script:**
+```bash
+${SRCROOT}/.symlinks/plugins/flutter_environment_config/ios/Classes/BuildXCConfig.rb ${SRCROOT}/ ${SRCROOT}/Flutter/tmp.xcconfig
+```
+
 ![Staging Scheme Configuration](./ios_scheme_staging.png)
 
-**Production Scheme:**
+#### Production Environment
+
+**First Script:**
+```bash
+echo "env/.env.production" > ${SRCROOT}/.envfile
+```
+
+**Second Script:**
+```bash
+${SRCROOT}/.symlinks/plugins/flutter_environment_config/ios/Classes/BuildXCConfig.rb ${SRCROOT}/ ${SRCROOT}/Flutter/tmp.xcconfig
+```
+
 ![Production Scheme Configuration](./ios_scheme_production.png)
+
+### 3. Build Configurations
+
+In Xcode, create separate build configurations for each environment:
+
+1. **Open Xcode Project**: Open `ios/Runner.xcworkspace` in Xcode
+2. **Select Project**: Click on the project name in the navigator
+3. **Go to Info Tab**: Select the "Info" tab in the project settings
+4. **Duplicate Configurations**: Under "Configurations", duplicate the existing configurations:
+
+   - Duplicate "Debug" → "Debug-develop"
+   - Duplicate "Debug" → "Debug-staging"
+   - Duplicate "Debug" → "Debug-production"
+   - Duplicate "Release" → "Release-develop"
+   - Duplicate "Release" → "Release-staging"
+   - Duplicate "Release" → "Release-production"
+
+5. **Create Schemes**: Go to **Product > Scheme > Manage Schemes** and create schemes for each environment:
+
+   - **develop**: Use Debug-develop and Release-develop configurations
+   - **staging**: Use Debug-staging and Release-staging configurations
+   - **production**: Use Debug-production and Release-production configurations
+
+![Xcode Build Configurations - Develop](./ios_build_configurations_develop.png)
+![Xcode Build Configurations - Staging](./ios_build_configurations_staging.png)  
+![Xcode Build Configurations - Production](./ios_build_configurations_production.png)
 
 ## 💻 Usage
 
@@ -238,34 +275,21 @@ FIREBASE_PROJECT_ID=your_project_id
 Add to your `.gitignore`:
 
 ```gitignore
-# Environment files
-env/.env.develop
-env/.env.staging
-env/.env.production
-env/.env.local
-
 # Generated files
 **/ios/Flutter/tmp.xcconfig
-```
-
-Create example files for team members:
-
-```text
-env/.env.develop.example
-env/.env.staging.example
-env/.env.production.example
+**/ios/.envfile
 ```
 
 ### 3. Build Configuration
 
 Configure dynamic app information in **Build Settings**:
 
-- **Product Bundle Identifier**: `$(APP_ID)`
+- **Product Bundle Identifier**: `$(BUNDLE_ID)`
 - **Product Name**: `$(APP_NAME)`
 
 In **User-Defined** section, set:
 
-- `APP_ID`: `$(APP_ID)`
+- `APP_ID`: `$(BUNDLE_ID)`
 - `APP_NAME`: `$(APP_NAME)`
 - `FLUTTER_BUILD_NAME`: `$(VERSION_NAME)`
 - `FLUTTER_BUILD_NUMBER`: `$(VERSION_CODE)`
@@ -305,6 +329,7 @@ In **User-Defined** section, set:
 3. **iOS build issues**
 
    - Ensure `tmp.xcconfig` is in `.gitignore`
+   - Ensure `.envfile` is in `.gitignore`
    - Verify Xcode schemes are properly configured
    - Check that Ruby script has execute permissions
 

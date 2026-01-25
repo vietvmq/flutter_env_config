@@ -18,7 +18,7 @@ my_app/
         └── build.gradle
 ```
 
-**Example `.env.develop`:**
+**Example `env/.env.develop`:**
 
 ```bash
 APP_NAME=[DEV] My App
@@ -30,7 +30,7 @@ API_KEY=dev-key-123
 DEBUG_MODE=true
 ```
 
-**Example `.env.staging`:**
+**Example `env/.env.staging`:**
 
 ```bash
 APP_NAME=[STAGING] My App
@@ -42,7 +42,7 @@ API_KEY=staging-key-456
 DEBUG_MODE=false
 ```
 
-**Example `.env.production`:**
+**Example `env/.env.production`:**
 
 ```bash
 APP_NAME=My App
@@ -54,25 +54,87 @@ API_KEY=prod-key-789
 DEBUG_MODE=false
 ```
 
-## 🚀 Quick Setup
+## 🛠️ Setup
 
-### 1. Apply the Plugin
+### 1. Configure Without Flavors
+
+If you are not using flavors in your project, specify a single environment file.
 
 In your `android/app/build.gradle` file:
 
 ```gradle
-// Environment file mapping (optional - for multiple environments)
+// Directly specify the environment file to use
+project.ext.defaultEnvFile = "env/.env.production" // Replace with your desired environment file
+apply from: project(':flutter_environment_config').projectDir.getPath() + "/dotenv.gradle"
+```
+
+**Default Behavior**: If no environment file is specified, the library will look for a `.env` file in the project root.
+
+### 2. Configure Flavors
+
+For projects with multiple environments using build flavors.
+
+In your `android/app/build.gradle` file:
+
+```gradle
+// Environment file mapping for multiple environments
 project.ext.envConfigFiles = [
     develop: "env/.env.develop",
     staging: "env/.env.staging",
     production: "env/.env.production"
 ]
-
-apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 apply from: project(':flutter_environment_config').projectDir.getPath() + "/dotenv.gradle"
 ```
 
-### 2. ProGuard Configuration (Release Builds)
+### 3. Configure Specific Flavors
+
+Configure Android build flavors in `android/app/build.gradle`:
+
+```gradle
+android {
+    flavorDimensions "environment"
+    productFlavors {
+        develop {
+            dimension "environment"
+            applicationIdSuffix ".dev"
+        }
+        staging {
+            dimension "environment"
+            applicationIdSuffix ".staging"
+        }
+        production {
+            dimension "environment"
+            applicationIdSuffix ""
+        }
+    }
+}
+```
+
+### 4. Configure ENVFILE Variable
+
+You can specify the environment file dynamically using the `ENVFILE` environment variable:
+
+```bash
+# Example: Use production environment file
+ENVFILE=env/.env.production ./gradlew assembleRelease
+
+# Example: Use staging environment file
+ENVFILE=env/.env.staging flutter build apk
+```
+
+### 5. Configure BuildConfig
+
+Enable BuildConfig generation in `android/app/build.gradle`:
+
+```gradle
+android {
+    buildFeatures {
+        buildConfig = true
+    }
+}
+```
+
+### 6. Configure ProGuard (Release Builds)
 
 Create `android/app/proguard-rules.pro`:
 
@@ -158,58 +220,20 @@ public class ApiService {
 }
 ```
 
-### Build Flavors Configuration
-
-Configure Android build flavors in `android/app/build.gradle`:
-
-```gradle
-android {
-    defaultConfig {
-        applicationId project.env.get("APP_ID")
-        versionName project.env.get("VERSION_NAME")
-        versionCode project.env.get("VERSION_CODE").toInteger()
-
-        // Required if package name differs from applicationId
-        resValue "string", "build_config_package", "com.my_package.my_app"
-    }
-
-    flavorDimensions "environment"
-    productFlavors {
-        develop {
-            dimension "environment"
-            applicationIdSuffix ".dev"
-        }
-        staging {
-            dimension "environment"
-            applicationIdSuffix ".staging"
-        }
-        production {
-            dimension "environment"
-            applicationIdSuffix ""
-        }
-    }
-}
-```
-
 ### Build Commands
 
 ```bash
-# Run in development
+# Run without flavors
+flutter run
+
+# Run with flavors
 flutter run --flavor develop
-
-# Run in staging
 flutter run --flavor staging
-
-# Run in production
 flutter run --flavor production
 
-# Build development APK
+# Build APKs
 flutter build apk --flavor develop
-
-# Build staging APK
 flutter build apk --flavor staging
-
-# Build production APK
 flutter build apk --flavor production --release
 ```
 
@@ -240,26 +264,6 @@ GOOGLE_MAPS_API_KEY=your_key_here
 FIREBASE_PROJECT_ID=your_project_id
 ```
 
-### 2. Git Configuration
-
-Add to your `.gitignore`:
-
-```gitignore
-# Environment files
-env/.env.develop
-env/.env.staging
-env/.env.production
-env/.env.local
-```
-
-Create example files for team members:
-
-```text
-env/.env.develop.example
-env/.env.staging.example
-env/.env.production.example
-```
-
 ## ⚠️ Security
 
 **Environment variables are embedded in your APK and can be extracted.**
@@ -281,27 +285,19 @@ env/.env.production.example
 ### Common Issues
 
 1. **Environment variables not loading**
-
-   - Ensure `await FlutterEnvironmentConfig.loadEnvVariables()` is called before `runApp()`
-   - Check that environment files exist in the project root
+   - Ensure environment files exist in the correct location
    - Verify file naming matches exactly (case-sensitive)
+   - Check that the correct environment file is being referenced
 
 2. **Variables are null in release builds**
-
    - Check ProGuard rules are applied correctly
-   - Verify environment files are loaded properly
+   - Verify BuildConfig is enabled
    - Ensure variables are defined in the correct environment file
 
 3. **Android build issues**
-
    - Ensure gradle files are properly configured
    - Check that flavor names match environment file configurations
    - Verify ProGuard rules are in place for release builds
-
-4. **Variables returning null**
-   - Check spelling of variable names (case-sensitive)
-   - Ensure variables are defined in the correct environment file
-   - Verify the correct environment file is being loaded
 
 ### Debug Tips
 
