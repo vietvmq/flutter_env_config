@@ -46,7 +46,6 @@ First stable release of Flutter Environment Config - A plugin that exposes envir
 ### 🎨 Developer Experience
 
 - ⚡ **Easy Setup**: Minimal configuration required
-- 🔄 **Hot Reload Support**: Environment changes work with Flutter hot reload
 - 🐛 **Debug Support**: Clear error messages and debugging information
 - 📱 **Flutter Integration**: Type-safe access to environment variables in Dart code
 

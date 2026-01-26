@@ -21,7 +21,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_environment_config: ^x.y.z # the latest version
+  flutter_environment_config: ^1.0.2
 ```
 
 ## 🚀 Usage
@@ -111,8 +111,8 @@ class ApiService {
 For accessing environment variables in native Android and iOS code:
 
 📚 **Platform-Specific Setup Guides:**
-- [📱 Android Setup Guide](docs/CONFIG_ANDROID.md) - Gradle configuration, build flavors, ProGuard setup
-- [🍎 iOS Setup Guide](docs/CONFIG_IOS.md) - Xcode schemes, Info.plist, Swift/Objective-C usage
+- [📱 Android Setup Guide](doc/CONFIG_ANDROID.md) - Gradle configuration, build flavors, ProGuard setup
+- [🍎 iOS Setup Guide](doc/CONFIG_IOS.md) - Xcode schemes, Info.plist, Swift/Objective-C usage
 
 ## ⚙️ Code Generator
 
