@@ -2,3 +2,8 @@ include: package:flutter_lints/flutter.yaml
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
+
+linter:
+  rules:
+    # Disable avoid_print for generator code since it's a CLI tool
+    avoid_print: false

@@ -11,16 +11,18 @@ void main(List<String> args) async {
 
   // Detect project context and configuration
   final projectConfig = await detectProjectConfig();
-  
+
   if (projectConfig == null) {
-    print(_yellow('⚠️  This command should be run from a project that uses flutter_environment_config.'));
+    print(_yellow(
+        '⚠️  This command should be run from a project that uses flutter_environment_config.'));
     print('');
-    print('💡 Make sure you have added flutter_environment_config to your pubspec.yaml:');
+    print(
+        '💡 Make sure you have added flutter_environment_config to your pubspec.yaml:');
     print('   dependencies:');
     print('     flutter_environment_config: ^1.0.0');
     return;
   }
-  
+
   final workingDirectory = Directory(projectConfig.workingDir);
   final outputPath = projectConfig.outputPath;
 
@@ -32,10 +34,11 @@ void main(List<String> args) async {
   // Read environment variables from all .env files in the working directory
   final envVariables = <String, EnvVariable>{};
   final envFiles = await scanEnvFiles(workingDirectory);
-  
+
   if (envFiles.isEmpty) {
     print('❌ No .env.* files found in ${workingDirectory.path}');
-    print('💡 Create .env files like .env.develop, .env.staging, .env.production');
+    print(
+        '💡 Create .env files like .env.develop, .env.staging, .env.production');
     return;
   }
 
@@ -70,11 +73,13 @@ void main(List<String> args) async {
   print(_magenta('⚙️  Generating code...'));
 
   // Generate the extension
-  final generatedCode = generateExtension(envVariables, envFiles, projectConfig);
+  final generatedCode =
+      generateExtension(envVariables, envFiles, projectConfig);
 
   // Write to file
   final outputFile = File(outputPath);
-  await outputFile.parent.create(recursive: true); // Create directories if needed
+  await outputFile.parent
+      .create(recursive: true); // Create directories if needed
   await outputFile.writeAsString(generatedCode);
 
   print('');
@@ -85,9 +90,10 @@ void main(List<String> args) async {
   print(_brightYellow('💡 Customize output directory in pubspec.yaml:'));
   print('   flutter_environment_config:');
   print('     output_dir: lib/generated  # or any other directory');
-  
+
   print('');
-  print(_brightCyan('🎉 Done! You can now use FlutterEnvironmentConfigGeneration.propertyName for type-safe access.'));
+  print(_brightCyan(
+      '🎉 Done! You can now use FlutterEnvironmentConfigGeneration.propertyName for type-safe access.'));
 }
 
 class EnvVariable {
@@ -150,20 +156,25 @@ String inferType(String value) {
   return 'String';
 }
 
-String generateExtension(Map<String, EnvVariable> variables, List<String> allEnvFiles, ProjectConfig config) {
+String generateExtension(Map<String, EnvVariable> variables,
+    List<String> allEnvFiles, ProjectConfig config) {
   final buffer = StringBuffer();
 
   buffer.writeln('// GENERATED CODE - DO NOT MODIFY BY HAND');
   buffer.writeln('// Generated on: ${DateTime.now().toIso8601String()}');
-  buffer.writeln('// Variables: ${variables.length} from ${allEnvFiles.length} environment files');
+  buffer.writeln(
+      '// Variables: ${variables.length} from ${allEnvFiles.length} environment files');
   buffer.writeln();
-  
-  buffer.writeln('import \'package:flutter_environment_config/flutter_environment_config.dart\';');
+
+  buffer.writeln(
+      'import \'package:flutter_environment_config/flutter_environment_config.dart\';');
   buffer.writeln();
-  
+
   // Generate the Generation class
-  buffer.writeln('/// Type-safe access to environment variables through code generation.');
-  buffer.writeln('/// This class provides static-only access and cannot be instantiated.');
+  buffer.writeln(
+      '/// Type-safe access to environment variables through code generation.');
+  buffer.writeln(
+      '/// This class provides static-only access and cannot be instantiated.');
   buffer.writeln('abstract class FlutterEnvironmentConfigGeneration {');
   buffer.writeln('  // Private constructor to prevent instantiation');
   buffer.writeln('  FlutterEnvironmentConfigGeneration._();');
@@ -173,19 +184,20 @@ String generateExtension(Map<String, EnvVariable> variables, List<String> allEnv
   for (final variable in variables.values) {
     final getterName = generateGetterName(variable.key);
     final returnType = variable.type;
-    
+
     // Generate file availability comment
     final availableFiles = variable.availableInFiles
         .map((f) => f.split('/').last.replaceAll('.example', ''))
-        .toList()..sort();
+        .toList()
+      ..sort();
     final allFileNames = allEnvFiles
         .map((f) => f.split('/').last.replaceAll('.example', ''))
         .toList();
-    final missingFiles = allFileNames
-        .where((f) => !availableFiles.contains(f))
-        .toList();
+    final missingFiles =
+        allFileNames.where((f) => !availableFiles.contains(f)).toList();
 
-    buffer.writeln('  /// Gets the value of ${variable.key} environment variable.');
+    buffer.writeln(
+        '  /// Gets the value of ${variable.key} environment variable.');
     buffer.writeln('  /// Available in: ${availableFiles.join(', ')}');
     if (missingFiles.isNotEmpty) {
       buffer.writeln('  /// Missing in: ${missingFiles.join(', ')}');
@@ -194,17 +206,22 @@ String generateExtension(Map<String, EnvVariable> variables, List<String> allEnv
     buffer.writeln('  static $returnType? get $getterName {');
 
     if (returnType == 'bool') {
-      buffer.writeln('    final value = FlutterEnvironmentConfig.get(\'${variable.key}\');');
+      buffer.writeln(
+          '    final value = FlutterEnvironmentConfig.get(\'${variable.key}\');');
       buffer.writeln('    return value?.toLowerCase() == \'true\';');
     } else if (returnType == 'int') {
-      buffer.writeln('    final value = FlutterEnvironmentConfig.get(\'${variable.key}\');');
+      buffer.writeln(
+          '    final value = FlutterEnvironmentConfig.get(\'${variable.key}\');');
       buffer.writeln('    return value != null ? int.tryParse(value) : null;');
     } else if (returnType == 'double') {
-      buffer.writeln('    final value = FlutterEnvironmentConfig.get(\'${variable.key}\');');
-      buffer.writeln('    return value != null ? double.tryParse(value) : null;');
+      buffer.writeln(
+          '    final value = FlutterEnvironmentConfig.get(\'${variable.key}\');');
+      buffer
+          .writeln('    return value != null ? double.tryParse(value) : null;');
     } else {
       // String type
-      buffer.writeln('    return FlutterEnvironmentConfig.get(\'${variable.key}\');');
+      buffer.writeln(
+          '    return FlutterEnvironmentConfig.get(\'${variable.key}\');');
     }
 
     buffer.writeln('  }');
@@ -215,7 +232,8 @@ String generateExtension(Map<String, EnvVariable> variables, List<String> allEnv
   buffer.writeln('  // Environment variable keys');
   for (final variable in variables.values) {
     final constantName = generateConstantName(variable.key);
-    buffer.writeln('  static const String $constantName = \'${variable.key}\';');
+    buffer
+        .writeln('  static const String $constantName = \'${variable.key}\';');
   }
 
   buffer.writeln('}');
@@ -227,16 +245,16 @@ String generateGetterName(String envKey) {
   // Convert environment variable name to camelCase getter name
   final parts = envKey.toLowerCase().split('_');
   final first = parts.first;
-  final rest = parts.skip(1).map((part) => part.isNotEmpty 
-      ? part[0].toUpperCase() + part.substring(1) 
-      : '').join();
+  final rest = parts
+      .skip(1)
+      .map((part) =>
+          part.isNotEmpty ? part[0].toUpperCase() + part.substring(1) : '')
+      .join();
   return first + rest;
 }
 
 String generateConstantName(String envKey) {
-  return 'k${envKey.toLowerCase().split('_').map((part) => 
-      part.isNotEmpty ? part[0].toUpperCase() + part.substring(1) : ''
-  ).join()}Key';
+  return 'k${envKey.toLowerCase().split('_').map((part) => part.isNotEmpty ? part[0].toUpperCase() + part.substring(1) : '').join()}Key';
 }
 
 /// Configuration for project detection and output path
@@ -254,13 +272,13 @@ class ProjectConfig {
 /// Returns null if not a valid consumer project
 Future<ProjectConfig?> detectProjectConfig() async {
   final currentDir = Directory.current.path;
-  
+
   // Check if we're in a Flutter project (has pubspec.yaml)
   final pubspecFile = File('$currentDir/pubspec.yaml');
   if (await pubspecFile.exists()) {
     final pubspecContent = await pubspecFile.readAsString();
     final pubspec = loadYaml(pubspecContent) as Map;
-    
+
     // Check if we're running from within the library itself - reject this case
     final libDir = Directory('$currentDir/lib');
     if (await libDir.exists()) {
@@ -270,14 +288,15 @@ Future<ProjectConfig?> detectProjectConfig() async {
         return null;
       }
     }
-    
+
     // Check if this project uses flutter_environment_config
     final dependencies = pubspec['dependencies'] as Map?;
     final devDependencies = pubspec['dev_dependencies'] as Map?;
-    
-    final usesThisLibrary = dependencies?.containsKey('flutter_environment_config') == true ||
-                           devDependencies?.containsKey('flutter_environment_config') == true;
-    
+
+    final usesThisLibrary =
+        dependencies?.containsKey('flutter_environment_config') == true ||
+            devDependencies?.containsKey('flutter_environment_config') == true;
+
     if (usesThisLibrary) {
       // This is a consumer project
       final outputDir = _getOutputDirFromPubspec(pubspec);
@@ -286,14 +305,14 @@ Future<ProjectConfig?> detectProjectConfig() async {
         outputPath: '$currentDir/$outputDir/flutter_environment_config.g.dart',
       );
     }
-    
+
     // If root project doesn't have flutter_environment_config, search in packages
     final configFromPackages = await _findConfigInPackages(currentDir);
     if (configFromPackages != null) {
       return configFromPackages;
     }
   }
-  
+
   // Not a valid consumer project
   return null;
 }
@@ -309,7 +328,7 @@ String _getOutputDirFromPubspec(Map pubspec) {
       return outputDir;
     }
   }
-  
+
   // Default to lib/generated directory
   print('📁 Using default output directory: lib/generated');
   return 'lib/generated';
@@ -319,7 +338,7 @@ String _getOutputDirFromPubspec(Map pubspec) {
 Future<ProjectConfig?> _findConfigInPackages(String projectRoot) async {
   final packagesDir = Directory('$projectRoot/packages');
   if (!await packagesDir.exists()) return null;
-  
+
   try {
     await for (final entity in packagesDir.list()) {
       if (entity is Directory) {
@@ -328,19 +347,23 @@ Future<ProjectConfig?> _findConfigInPackages(String projectRoot) async {
           try {
             final pubspecContent = await pubspecFile.readAsString();
             final pubspec = loadYaml(pubspecContent) as Map;
-            
+
             final dependencies = pubspec['dependencies'] as Map?;
             final devDependencies = pubspec['dev_dependencies'] as Map?;
-            
-            final usesThisLibrary = dependencies?.containsKey('flutter_environment_config') == true ||
-                                   devDependencies?.containsKey('flutter_environment_config') == true;
-            
+
+            final usesThisLibrary = dependencies
+                        ?.containsKey('flutter_environment_config') ==
+                    true ||
+                devDependencies?.containsKey('flutter_environment_config') ==
+                    true;
+
             if (usesThisLibrary) {
               // Found flutter_environment_config in this package
               final outputDir = _getOutputDirFromPubspec(pubspec);
               return ProjectConfig(
                 workingDir: projectRoot,
-                outputPath: '$projectRoot/$outputDir/flutter_environment_config.g.dart',
+                outputPath:
+                    '$projectRoot/$outputDir/flutter_environment_config.g.dart',
               );
             }
           } catch (e) {
@@ -353,26 +376,26 @@ Future<ProjectConfig?> _findConfigInPackages(String projectRoot) async {
   } catch (e) {
     // Skip if there are permission errors
   }
-  
+
   return null;
 }
 
 /// Scan for environment files in the specified directory (recursive)
 Future<List<String>> scanEnvFiles(Directory directory) async {
   final envFiles = <String>[];
-  
+
   // First scan root directory
   await for (final entity in directory.list()) {
     if (entity is File) {
       final name = entity.path.split('/').last;
       // Look for .env, .env.*, but skip .env.example files
-      if (name == '.env' || 
+      if (name == '.env' ||
           (name.startsWith('.env.') && !name.endsWith('.example'))) {
         envFiles.add(entity.path);
       }
     }
   }
-  
+
   // Also scan subdirectories regardless of root files
   await for (final entity in directory.list()) {
     if (entity is Directory) {
@@ -384,7 +407,7 @@ Future<List<String>> scanEnvFiles(Directory directory) async {
       }
     }
   }
-  
+
   envFiles.sort(); // Ensure consistent ordering
   return envFiles;
 }
@@ -392,13 +415,13 @@ Future<List<String>> scanEnvFiles(Directory directory) async {
 /// Scan a specific directory for env files (non-recursive to avoid going too deep)
 Future<List<String>> _scanDirectoryForEnvFiles(Directory directory) async {
   final envFiles = <String>[];
-  
+
   try {
     await for (final entity in directory.list()) {
       if (entity is File) {
         final name = entity.path.split('/').last;
         // Look for .env, .env.*, but skip .env.example files
-        if (name == '.env' || 
+        if (name == '.env' ||
             (name.startsWith('.env.') && !name.endsWith('.example'))) {
           envFiles.add(entity.path);
         }
@@ -407,7 +430,7 @@ Future<List<String>> _scanDirectoryForEnvFiles(Directory directory) async {
   } catch (e) {
     // Ignore permission errors or other issues
   }
-  
+
   return envFiles;
 }
 
@@ -415,13 +438,15 @@ Future<List<String>> _scanDirectoryForEnvFiles(Directory directory) async {
 bool _shouldSkipDirectory(String dirName) {
   final skipDirs = {
     'node_modules', '.git', '.dart_tool', 'build', '.vscode', '.idea',
-    'ios', 'android', 'web', 'linux', 'macos', 'windows', // Flutter platform dirs
-    'lib', 'test', 'integration_test', // Dart/Flutter source dirs (usually don't contain env)
+    'ios', 'android', 'web', 'linux', 'macos',
+    'windows', // Flutter platform dirs
+    'lib', 'test',
+    'integration_test', // Dart/Flutter source dirs (usually don't contain env)
     '.pub-cache', '.flutter-plugins-dependencies',
     'Pods', 'Runner.xcworkspace', 'Runner.xcodeproj', // iOS specific
     'gradle', '.gradle', 'app', 'src', // Android specific
   };
-  
+
   return skipDirs.contains(dirName) || dirName.startsWith('.');
 }
 

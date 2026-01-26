@@ -9,18 +9,12 @@ void main() {
   group('Environment Logic Tests', () {
     test('String toCamelCase conversion logic', () {
       String toCamelCase(String snakeCase) {
-        return snakeCase
-            .toLowerCase()
-            .split('_')
-            .asMap()
-            .entries
-            .map((entry) {
-              if (entry.key == 0) {
-                return entry.value;
-              }
-              return entry.value[0].toUpperCase() + entry.value.substring(1);
-            })
-            .join('');
+        return snakeCase.toLowerCase().split('_').asMap().entries.map((entry) {
+          if (entry.key == 0) {
+            return entry.value;
+          }
+          return entry.value[0].toUpperCase() + entry.value.substring(1);
+        }).join('');
       }
 
       expect(toCamelCase('APP_NAME'), equals('appName'));
@@ -32,22 +26,22 @@ void main() {
     test('Type inference logic', () {
       String? inferType(String value) {
         if (value.isEmpty) return 'String?';
-        
+
         // Try bool
         if (value.toLowerCase() == 'true' || value.toLowerCase() == 'false') {
           return 'bool?';
         }
-        
+
         // Try int
         if (int.tryParse(value) != null) {
           return 'int?';
         }
-        
+
         // Try double
         if (double.tryParse(value) != null) {
           return 'double?';
         }
-        
+
         // Default to String
         return 'String?';
       }
@@ -72,9 +66,9 @@ void main() {
 
     test('Environment variable validation', () {
       bool isValidEnvKey(String key) {
-        return key.isNotEmpty && 
-               key.toUpperCase() == key && 
-               RegExp(r'^[A-Z_][A-Z0-9_]*$').hasMatch(key);
+        return key.isNotEmpty &&
+            key.toUpperCase() == key &&
+            RegExp(r'^[A-Z_][A-Z0-9_]*$').hasMatch(key);
       }
 
       expect(isValidEnvKey('APP_NAME'), isTrue);
